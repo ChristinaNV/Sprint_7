@@ -5,9 +5,9 @@ import ru.yandex.scooter.models.Order;
 
 import static io.restassured.RestAssured.given;
 
-public class OrderApi {
-
-    private static final String BASE_URL = "https://qa-scooter.praktikum-services.ru";
+public class OrderApi extends BaseApi {
+    private static final String ORDERS_ENDPOINT = "/api/v1/orders";
+    private static final String CANCEL_ORDER_ENDPOINT = "/api/v1/orders/cancel";
 
     public Response createOrder(Order order) {
         return given()
@@ -15,7 +15,7 @@ public class OrderApi {
                 .baseUri(BASE_URL)
                 .body(order)
                 .when()
-                .post("/api/v1/orders");
+                .post(ORDERS_ENDPOINT);
     }
 
     public Response getOrdersList() {
@@ -23,7 +23,7 @@ public class OrderApi {
                 .header("Content-type", "application/json")
                 .baseUri(BASE_URL)
                 .when()
-                .get("/api/v1/orders");
+                .get(ORDERS_ENDPOINT);
     }
 
     public Response cancelOrder(int trackId) {
@@ -32,7 +32,6 @@ public class OrderApi {
                 .baseUri(BASE_URL)
                 .body("{\"track\": " + trackId + "}")
                 .when()
-                .put("/api/v1/orders/cancel");
+                .put(CANCEL_ORDER_ENDPOINT);
     }
-
 }

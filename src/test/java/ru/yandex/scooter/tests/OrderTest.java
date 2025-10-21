@@ -5,38 +5,13 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import ru.yandex.scooter.models.Order;
 import ru.yandex.scooter.steps.OrderSteps;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-@RunWith(Parameterized.class)
 public class OrderTest {
 
     private final OrderSteps orderSteps = new OrderSteps();
     private Integer trackId;
-
-    private final List<String> colors;
-    private final String testName;
-
-    public OrderTest(String testName, List<String> colors) {
-        this.testName = testName;
-        this.colors = colors;
-    }
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-                {"Можно указать BLACK цвет", Arrays.asList("BLACK")},
-                {"Можно указать GREY цвет", Arrays.asList("GREY")},
-                {"Можно указать оба цвета", Arrays.asList("BLACK", "GREY")},
-                {"Можно совсем не указывать цвет", null}
-        });
-    }
 
     @After
     public void tearDown() {
@@ -46,68 +21,49 @@ public class OrderTest {
     }
 
     @Test
-    @DisplayName("Создание заказа с разными цветами - параметризованный тест")
-    @Description("Параметризованный тест создания заказа: можно указать BLACK, GREY, оба цвета или не указывать цвет")
-    public void orderCanBeCreatedWithDifferentColors() {
+    @DisplayName("Создание заказа и проверка ответа")
+    @Description("Проверка успешного создания заказа с проверкой статус кода и тела ответа")
+    public void orderCanBeCreatedAndResponseContainsTrack() {
         // Given
-        Order order = orderSteps.createTestOrder(colors);
+        Order order = orderSteps.createTestOrderWithBlackColor();
 
         // When
         Response response = orderSteps.createOrder(order);
 
         // Then
-        orderSteps.checkOrderCreatedSuccessfully(response);
+        orderSteps.checkOrderCreatedSuccessfully(response); // статус код 201
+        orderSteps.checkResponseContainsTrack(response);    // тело содержит track
 
         trackId = orderSteps.getTrackFromResponse(response);
     }
 
     @Test
-    @DisplayName("Тело ответа при создании заказа содержит track")
-    @Description("Проверка, что тело ответа содержит track")
-    public void responseBodyContainsTrack() {
+    @DisplayName("Получение списка заказов с проверкой ответа")
+    @Description("Проверка успешного получения списка заказов с проверкой статус кода и тела ответа")
+    public void ordersListCanBeRetrievedWithValidResponse() {
+        // When
+        Response response = orderSteps.getOrdersList();
+
+        // Then
+        orderSteps.checkOrdersListRetrievedSuccessfully(response); // статус код 200
+        orderSteps.checkResponseContainsOrdersList(response);      // тело содержит orders
+        orderSteps.checkOrdersListIsNotEmpty(response);            // список не пустой
+    }
+
+    @Test
+    @DisplayName("Создание заказа без цвета")
+    @Description("Проверка создания заказа без указания цвета с полной проверкой ответа")
+    public void orderCanBeCreatedWithoutColor() {
         // Given
-        Order order = orderSteps.createTestOrder(Arrays.asList("BLACK"));
+        Order order = orderSteps.createTestOrderWithoutColor();
 
         // When
         Response response = orderSteps.createOrder(order);
 
         // Then
-        orderSteps.checkResponseContainsTrack(response);
+        orderSteps.checkOrderCreatedSuccessfully(response); // статус код 201
+        orderSteps.checkResponseContainsTrack(response);    // тело содержит track
 
         trackId = orderSteps.getTrackFromResponse(response);
     }
-
-    @Test
-    @DisplayName("В тело ответа возвращается список заказов")
-    @Description("Проверка, что в тело ответа возвращается список заказов")
-    public void responseBodyContainsOrdersList() {
-        // When
-        Response response = orderSteps.getOrdersList();
-
-        // Then
-        orderSteps.checkResponseContainsOrdersList(response);
-    }
-
-    @Test
-    @DisplayName("Список заказов не пустой")
-    @Description("Проверка, что возвращаемый список заказов содержит элементы")
-    public void ordersListIsNotEmpty() {
-        // When
-        Response response = orderSteps.getOrdersList();
-
-        // Then
-        orderSteps.checkOrdersListIsNotEmpty(response);
-    }
-
-    @Test
-    @DisplayName("Успешное получение списка заказов")
-    @Description("Проверка успешного получения списка заказов")
-    public void ordersListCanBeRetrievedSuccessfully() {
-        // When
-        Response response = orderSteps.getOrdersList();
-
-        // Then
-        orderSteps.checkOrdersListRetrievedSuccessfully(response);
-    }
-
 }

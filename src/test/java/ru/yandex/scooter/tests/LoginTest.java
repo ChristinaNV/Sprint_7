@@ -44,20 +44,7 @@ public class LoginTest {
 
         // Then
         courierSteps.checkStatusCode200(response);
-    }
-
-    @Test
-    @DisplayName("Успешный запрос авторизации возвращает id")
-    @Description("Проверка, что успешный запрос возвращает id")
-    public void successfulLoginReturnsId() {
-        // Given
-        CourierLogin credentials = new CourierLogin(testCourier.getLogin(), testCourier.getPassword());
-
-        // When
-        Response response = courierSteps.loginCourier(credentials);
-
-        // Then
-        courierSteps.checkResponseContainsId(response);
+        courierSteps.checkResponseContainsId(response); // Добавляем проверку тела
     }
 
     @Test
@@ -72,6 +59,7 @@ public class LoginTest {
 
         // Then
         courierSteps.checkStatusCode404(response);
+        courierSteps.checkAccountNotFoundMessage(response); // Добавляем проверку тела
     }
 
     @Test
@@ -86,6 +74,7 @@ public class LoginTest {
 
         // Then
         courierSteps.checkStatusCode404(response);
+        courierSteps.checkAccountNotFoundMessage(response); // Добавляем проверку тела
     }
 
     @Test
@@ -100,6 +89,7 @@ public class LoginTest {
 
         // Then
         courierSteps.checkStatusCode400(response);
+        courierSteps.checkInsufficientDataForLoginMessage(response); // Добавляем проверку тела
     }
 
     @Test
@@ -114,34 +104,7 @@ public class LoginTest {
 
         // Then
         courierSteps.checkStatusCode400(response);
-    }
-
-    @Test
-    @DisplayName("Авторизация без логина возвращает правильное сообщение")
-    @Description("Проверка правильного сообщения об ошибке при авторизации без логина")
-    public void loginWithoutLoginReturnsCorrectMessage() {
-        // Given
-        CourierLogin credentials = courierSteps.createCredentialsWithoutLogin(testCourier);
-
-        // When
-        Response response = courierSteps.loginCourier(credentials);
-
-        // Then
-        courierSteps.checkInsufficientDataForLoginMessage(response);
-    }
-
-    @Test
-    @DisplayName("Авторизация без пароля возвращает правильное сообщение")
-    @Description("Проверка правильного сообщения об ошибке при авторизации без пароля")
-    public void loginWithoutPasswordReturnsCorrectMessage() {
-        // Given
-        CourierLogin credentials = courierSteps.createCredentialsWithoutPassword(testCourier);
-
-        // When
-        Response response = courierSteps.loginCourier(credentials);
-
-        // Then
-        courierSteps.checkInsufficientDataForLoginMessage(response);
+        courierSteps.checkInsufficientDataForLoginMessage(response); // Добавляем проверку тела
     }
 
     @Test
@@ -156,19 +119,6 @@ public class LoginTest {
 
         // Then
         courierSteps.checkStatusCode404(response);
-    }
-
-    @Test
-    @DisplayName("Авторизация под несуществующим пользователем возвращает правильное сообщение")
-    @Description("Проверка правильного сообщения об ошибке при авторизации несуществующего пользователя")
-    public void loginWithNonExistentCourierReturnsCorrectMessage() {
-        // Given
-        CourierLogin credentials = courierSteps.createNonExistentCourierCredentials();
-
-        // When
-        Response response = courierSteps.loginCourier(credentials);
-
-        // Then
-        courierSteps.checkAccountNotFoundMessage(response);
+        courierSteps.checkAccountNotFoundMessage(response); // Добавляем проверку тела
     }
 }

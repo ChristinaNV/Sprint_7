@@ -2,74 +2,63 @@ package ru.yandex.scooter.steps;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
-import ru.yandex.scooter.api.OrderApi;
 import ru.yandex.scooter.models.Order;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+public class OrderSteps extends BaseSteps {
 
-public class OrderSteps {
-
-    private final OrderApi orderClient = new OrderApi();
+    private final OrderApiSteps apiSteps = new OrderApiSteps();
+    private final OrderDataSteps dataSteps = new OrderDataSteps();
 
     @Step("Создать заказ")
     public Response createOrder(Order order) {
-        return orderClient.createOrder(order);
-    }
-
-    @Step("Проверить успешное создание заказа")
-    public void checkOrderCreatedSuccessfully(Response response) {
-        response.then().statusCode(201);
-    }
-
-    @Step("Проверить, что ответ содержит track")
-    public void checkResponseContainsTrack(Response response) {
-        response.then().body("track", notNullValue());
+        return apiSteps.createOrder(order);
     }
 
     @Step("Получить список заказов")
     public Response getOrdersList() {
-        return orderClient.getOrdersList();
-    }
-
-    @Step("Проверить успешное получение списка заказов")
-    public void checkOrdersListRetrievedSuccessfully(Response response) {
-        response.then().statusCode(200);
-    }
-
-    @Step("Проверить, что ответ содержит список заказов")
-    public void checkResponseContainsOrdersList(Response response) {
-        response.then().body("orders", notNullValue());
-    }
-
-    @Step("Проверить, что список заказов не пустой")
-    public void checkOrdersListIsNotEmpty(Response response) {
-        response.then().body("orders.size()", greaterThan(0));
+        return apiSteps.getOrdersList();
     }
 
     @Step("Отменить заказ")
     public Response cancelOrder(int trackId) {
-        return orderClient.cancelOrder(trackId);
+        return apiSteps.cancelOrder(trackId);
     }
 
     @Step("Получить track из ответа")
     public int getTrackFromResponse(Response response) {
-        return response.then().extract().path("track");
+        return apiSteps.getTrackFromResponse(response);
     }
 
     @Step("Создать тестовый заказ с цветами: {colors}")
     public Order createTestOrder(List<String> colors) {
-        return new Order(
-                "Иван",
-                "Иванов",
-                "ул. Пушкина, д. 10",
-                "5",
-                "+79991234567",
-                3,
-                "2024-12-31",
-                "Тестовый комментарий",
-                colors
-        );
+        return dataSteps.createTestOrder(colors);
+    }
+
+    @Step("Создать тестовый заказ с цветом BLACK")
+    public Order createTestOrderWithBlackColor() {
+        return dataSteps.createTestOrderWithBlackColor();
+    }
+
+    @Step("Создать тестовый заказ с цветом GREY")
+    public Order createTestOrderWithGreyColor() {
+        return dataSteps.createTestOrderWithGreyColor();
+    }
+
+    @Step("Создать тестовый заказ без цвета")
+    public Order createTestOrderWithoutColor() {
+        return dataSteps.createTestOrderWithoutColor();
+    }
+
+    // Методы проверки
+    @Step("Проверить успешное создание заказа")
+    public void checkOrderCreatedSuccessfully(Response response) {
+        checkStatusCode201(response);
+    }
+
+    @Step("Проверить успешное получение списка заказов")
+    public void checkOrdersListRetrievedSuccessfully(Response response) {
+        checkStatusCode200(response);
     }
 }

@@ -34,23 +34,6 @@ public class CourierTest {
 
         // Then
         courierSteps.checkStatusCode201(response);
-
-        courierId = courierSteps.getCourierId(
-                new CourierLogin(testCourier.getLogin(), testCourier.getPassword())
-        );
-    }
-
-    @Test
-    @DisplayName("Успешный запрос создания курьера возвращает ok: true")
-    @Description("Проверка, что успешный запрос возвращает ok: true")
-    public void successfulCreationReturnsOkTrue() {
-        // Given
-        testCourier = courierSteps.createUniqueTestCourier();
-
-        // When
-        Response response = courierSteps.createCourier(testCourier);
-
-        // Then
         courierSteps.checkResponseContainsOkTrue(response);
 
         courierId = courierSteps.getCourierId(
@@ -74,23 +57,6 @@ public class CourierTest {
 
         // Then
         courierSteps.checkStatusCode409(response);
-    }
-
-    @Test
-    @DisplayName("Создание курьера с существующим логином возвращает ошибку")
-    @Description("Проверка, что при создании пользователя с логином, который уже есть, возвращается ошибка")
-    public void createCourierWithExistingLoginReturnsError() {
-        // Given
-        testCourier = courierSteps.createUniqueTestCourier();
-        courierSteps.createCourier(testCourier);
-        courierId = courierSteps.getCourierId(
-                new CourierLogin(testCourier.getLogin(), testCourier.getPassword())
-        );
-
-        // When
-        Response response = courierSteps.createCourier(testCourier);
-
-        // Then
         courierSteps.checkDuplicateLoginMessage(response);
     }
 
@@ -106,6 +72,7 @@ public class CourierTest {
 
         // Then
         courierSteps.checkStatusCode400(response);
+        courierSteps.checkInsufficientDataForCreationMessage(response);
     }
 
     @Test
@@ -120,33 +87,6 @@ public class CourierTest {
 
         // Then
         courierSteps.checkStatusCode400(response);
-    }
-
-    @Test
-    @DisplayName("Создание курьера без логина возвращает правильное сообщение")
-    @Description("Проверка правильного сообщения об ошибке при создании без логина")
-    public void createCourierWithoutLoginReturnsCorrectMessage() {
-        // Given
-        Courier courier = courierSteps.createCourierWithoutLogin();
-
-        // When
-        Response response = courierSteps.createCourier(courier);
-
-        // Then
-        courierSteps.checkInsufficientDataForCreationMessage(response);
-    }
-
-    @Test
-    @DisplayName("Создание курьера без пароля возвращает правильное сообщение")
-    @Description("Проверка правильного сообщения об ошибке при создании без пароля")
-    public void createCourierWithoutPasswordReturnsCorrectMessage() {
-        // Given
-        Courier courier = courierSteps.createCourierWithoutPassword();
-
-        // When
-        Response response = courierSteps.createCourier(courier);
-
-        // Then
         courierSteps.checkInsufficientDataForCreationMessage(response);
     }
 
@@ -162,6 +102,7 @@ public class CourierTest {
 
         // Then
         courierSteps.checkStatusCode201(response);
+        courierSteps.checkResponseContainsOkTrue(response);
 
         courierId = courierSteps.getCourierId(
                 new CourierLogin(courier.getLogin(), courier.getPassword())
